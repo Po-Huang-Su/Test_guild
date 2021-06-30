@@ -1,0 +1,46 @@
+<launch>
+
+  <arg name="robot_name"  default="$(env ROBOTNAME)"/>
+  <arg name="robot_type"  default="$(env ROBOT_TYPE)"/>
+  <arg name="multi_signal"  default="$(env ROBOT_STYLE_MULTI_SIGNAL)"/>
+
+  <!-- ============= Signal or Follow ============= -->
+  <group if="$(arg multi_signal)">
+
+    <!-- Load the URDF/Xacro model of our robot -->
+    <arg name="urdf_file" default="$(find xacro)/xacro '--inorder' '$(find description)/urdf/dashgobase/dashgobase.xacro' use_nominal_extrinsics:=false"/>
+
+    <param name="robot_description" command="$(arg urdf_file)" />
+    
+    <!-- Publish the robot state -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+        <param name="publish_frequency" value="30.0"/>
+    </node>
+
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <param name="rate" value="30.0"/>
+    </node>
+
+  </group>
+
+  <!-- ============= Multi ============= -->
+  <group unless="$(arg multi_signal)">
+    <group ns ="$(arg robot_name)" >
+
+      <!-- Load the URDF/Xacro model of our robot -->
+      <arg name="urdf_file" default="$(find xacro)/xacro '--inorder' '$(find description)/urdf/dashgobase/dashgobase.xacro' use_nominal_extrinsics:=false"/>
+      <param name="robot_description" command="$(arg urdf_file)" />
+    
+      <!-- Publish the robot state -->
+      <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher">
+          <param name="publish_frequency" value="30.0"/>
+      </node>
+
+      <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    	<param name="rate" value="30.0"/>
+      </node>
+
+    </group>
+  </group>
+    
+</launch>
